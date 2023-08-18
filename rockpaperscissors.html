@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<style>
+			html, body, div, span, applet, object, iframe,
+			h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+			a, abbr, acronym, address, big, cite, code,
+			del, dfn, em, img, ins, kbd, q, s, samp,
+			small, strike, strong, sub, sup, tt, var,
+			b, u, i, center,
+			dl, dt, dd, ol, ul, li,
+			fieldset, form, label, legend,
+			table, caption, tbody, tfoot, thead, tr, th, td,
+			article, aside, canvas, details, embed, 
+			figure, figcaption, footer, header, hgroup, 
+			menu, nav, output, ruby, section, summary,
+			time, mark, audio, video {
+				margin: 0;
+				padding: 0;
+				border: 0;
+				font-size: 100%;
+				font: inherit;
+				vertical-align: baseline;
+			}
+
+			/* HTML5 display-role reset for older browsers */
+			article, aside, details, figcaption, figure, 
+			footer, header, hgroup, menu, nav, section {
+				display: block;
+			}
+
+			body {
+				line-height: 1;
+			}
+
+			ol, ul {
+				list-style: none;
+			}
+
+			blockquote, q {
+				quotes: none;
+			}
+
+			blockquote:before, blockquote:after,
+			q:before, q:after {
+				content: '';
+				content: none;
+			}
+
+			table {
+				border-collapse: collapse;
+				border-spacing: 0;
+			}
+
+			#battleground {
+				position: relative;
+				font-family:segoe ui emoji;
+				font-size:"3.5em";
+				margin: 50px auto;
+				width: 500px;
+				height: 500px;
+				border: 1px solid #000;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="battleground">
+			
+		</div>
+	</body>
+
+	<script type="text/javascript">
+		const battleground = document.getElementById('battleground');
+		const fighterCount = 20;
+
+		window.onload = function() {
+			createSpanElements();
+
+
+
+
+
+
+
+
+
+
+
+const elements = document.querySelectorAll('.scissor, .rock, .paper');
+
+  function moveElementTowards(element, target) {
+    const elementRect = element.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+    const dx = targetRect.left - elementRect.left;
+    const dy = targetRect.top - elementRect.top;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    const speed = 1;
+    const stepX = (dx / distance) * speed;
+    const stepY = (dy / distance) * speed;
+
+    const interval = setInterval(() => {
+      element.style.left = `${elementRect.left + stepX}px`;
+      element.style.top = `${elementRect.top + stepY}px`;
+      const newElementRect = element.getBoundingClientRect();
+
+      if (Math.abs(newElementRect.left - targetRect.left) < speed &&
+          Math.abs(newElementRect.top - targetRect.top) < speed) {
+        clearInterval(interval);
+        target.classList.remove('scissor', 'rock', 'paper');
+        target.classList.add(element.classList[0]);
+        element.remove();
+      }
+    }, 1000);
+  }
+
+  elements.forEach(element => {
+    element.addEventListener('click', () => {
+      const targetClass = element.classList.contains('scissor') ? 'paper' :
+                          element.classList.contains('rock') ? 'scissor' :
+                          'rock';
+      const target = document.querySelector(`.${targetClass}`);
+      moveElementTowards(element, target);
+    });
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		}
+
+		function getRandomPosition(max) {
+  			return Math.floor(Math.random() * max);
+		}
+
+
+		function checkCollision(x, y, elements) {
+  			const rect1 = { left: x, right: x + 20, top: y, bottom: y + 20 };
+  			for (const el of elements) {
+    			const rect2 = el.getBoundingClientRect();
+    			if (
+				rect1.left < rect2.right &&
+				rect1.right > rect2.left &&
+				rect1.top < rect2.bottom &&
+				rect1.bottom > rect2.top
+    			) {
+      				return true;
+    			}
+  			}
+  			return false;
+		}
+
+		function createSpanElements(fighterType) {
+  			const parentDiv = battleground;
+  			const numElements = fighterCount * 3;
+  			const maxAttempts = 100;
+  			const spanElements = [];
+
+			for (let i = 0; i < numElements; i++) {
+				let xPos, yPos, attempts = 0;
+
+				do {
+					xPos = getRandomPosition(480);
+					yPos = getRandomPosition(480);
+					attempts++;
+
+					if (attempts >= maxAttempts) {
+						console.log("Could not find a suitable position for element", i);
+						break;
+					}
+				} while (checkCollision(xPos, yPos, spanElements));
+
+				const span = document.createElement("span");
+				span.style.width = "20px";
+				span.style.height = "20px";
+				span.style.position = "absolute";
+				span.style.left = xPos + "px";
+				span.style.top = yPos + "px";
+
+				if (i % 3 === 0) {
+					span.innerHTML = "✂";
+					span.className = "scissor";
+				} else if (i % 3 === 1) {
+					span.innerHTML = "🌑";
+					span.className = "rock";
+				} else {
+					span.innerHTML = "📜";
+					span.className = "paper";
+				}
+
+				spanElements.push(span);
+				parentDiv.appendChild(span);
+  			}
+		}
+
+
+
+
+
+
+
+
+
+
+
+		/*
+		function areElementsTouching(elem1, elem2) {
+	    	const rect1 = elem1.getBoundingClientRect();
+	    	const rect2 = elem2.getBoundingClientRect();
+	    
+	    	const leftDistance = Math.abs(rect1.left - rect2.left);
+	    	const topDistance = Math.abs(rect1.top - rect2.top);
+	    
+		    const horizontalTouch = leftDistance < 20; // Width of the elements
+		    const verticalTouch = topDistance < 20; // Height of the elements
+		    
+		    return horizontalTouch && verticalTouch;
+		}
+
+		function checkTouchingElements() {
+		    const spanElements = document.querySelectorAll('span'); // Replace with your actual selector
+		    
+		    for (let i = 0; i < spanElements.length; i++) {
+		        for (let j = i + 1; j < spanElements.length; j++) {
+		            if (areElementsTouching(spanElements[i], spanElements[j])) {
+		                //console.log("Elements are touching:", spanElements[i], spanElements[j]);
+						
+		            }
+		        }
+		    }
+		}
+		*/
+	</script>
+</html>
