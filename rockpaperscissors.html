@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 	<head>
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>Rock, Paper, Scissors Simulator</title>
 
 		<style>
 			html, body, div, span, applet, object, iframe,
@@ -80,83 +82,69 @@
 
 		const fighterCount = 20;
 
+		hasEnded = false;
+
 		window.onload = function() {
 			createSpanElements();
 
-			var startGame = setInterval(function() {
-				chaseElements(".scissor", ".paper");
-				chaseElements(".paper", ".rock");
-				chaseElements(".rock", ".scissor");
+			var moveElements = setInterval(function() {
+				if (!hasEnded) {
+					chaseElements(".scissor", ".paper");
+					chaseElements(".paper", ".rock");
+					chaseElements(".rock", ".scissor");
+				} else {
+					clearInterval(moveElements);
+				}
 			}, 60);
 		}
 
-function calculateDistance(elem1, elem2) {
-    const x1 = elem1.offsetLeft + elem1.offsetWidth / 2;
-    const y1 = elem1.offsetTop + elem1.offsetHeight / 2;
-    const x2 = elem2.offsetLeft + elem2.offsetWidth / 2;
-    const y2 = elem2.offsetTop + elem2.offsetHeight / 2;
+		function calculateDistance(elem1, elem2) {
+    		const x1 = elem1.offsetLeft + elem1.offsetWidth / 2;
+    		const y1 = elem1.offsetTop + elem1.offsetHeight / 2;
+    		const x2 = elem2.offsetLeft + elem2.offsetWidth / 2;
+    		const y2 = elem2.offsetTop + elem2.offsetHeight / 2;
     
-    const dx = x2 - x1;
-    const dy = y2 - y1;
+    		const dx = x2 - x1;
+    		const dy = y2 - y1;
     
-    return Math.sqrt(dx * dx + dy * dy);
-}
+    		return Math.sqrt(dx * dx + dy * dy);
+		}
 
 
-function chaseElements(attacker, targeted) {
-    const chasers = document.querySelectorAll(attacker);
-	const targets = document.querySelectorAll(targeted);
+		function chaseElements(attacker, targeted) {
+    		const chasers = document.querySelectorAll(attacker);
+			const targets = document.querySelectorAll(targeted);
 
-    chasers.forEach(chaser => {
-        let nearestTarget = null;
-        let nearestDistance = Infinity;
+    		chasers.forEach(chaser => {
+        		let nearestTarget = null;
+        		let nearestDistance = Infinity;
         
-        targets.forEach(target => {
-            const distance = calculateDistance(chaser, target);
-            if (distance < nearestDistance) {
-                nearestDistance = distance;
-                nearestTarget = target;
-            }
-        });
+        		targets.forEach(target => {
+            		const distance = calculateDistance(chaser, target);
+            		if (distance < nearestDistance) {
+                		nearestDistance = distance;
+                		nearestTarget = target;
+            		}
+        		});
         
-        if (nearestTarget) {
-            const chaserX = chaser.offsetLeft + getRandomPosition(-2, +2);
-            const chaserY = chaser.offsetTop + getRandomPosition(-2, +2);
-            const targetX = nearestTarget.offsetLeft;
-            const targetY = nearestTarget.offsetTop;
+        		if (nearestTarget) {
+            		const chaserX = chaser.offsetLeft + getRandomPosition(-1, +2);
+            		const chaserY = chaser.offsetTop + getRandomPosition(-1, +2);
+            		const targetX = nearestTarget.offsetLeft;
+            		const targetY = nearestTarget.offsetTop;
             
-            if (chaserX !== targetX) {
-        		chaser.style.left = chaserX + (chaserX < targetX ? 1 : -1) + 'px';
-            }
+            		if (chaserX !== targetX) {
+        				chaser.style.left = chaserX + (chaserX < targetX ? 1 : -1) + 'px';
+            		}
             
-            if (chaserY !== targetY) {
-                chaser.style.top = chaserY + (chaserY < targetY ? 1 : -1) + 'px';
-            }
-        }
-    });
+            		if (chaserY !== targetY) {
+                		chaser.style.top = chaserY + (chaserY < targetY ? 1 : -1) + 'px';
+            		}
+        		}
+    		});
 
-    checkTouchingElements()
-}
-
-
-
-		/*
-		function moveElements() {
-			spanElements = document.querySelectorAll('span');
-			for (let i = 0; i < spanElements.length; i++) {
-				if (getRandomPosition(1, 3) == 1)
-				{
-					xPos = parseInt(spanElements[i].style.left.slice(0, -2)) + getRandomPosition(-1, +2);
-					xPos = boundaryCheckX(xPos);
-					spanElements[i].style.left = xPos + "px";
-				} else {
-					yPos = parseInt(spanElements[i].style.top.slice(0, -2)) + getRandomPosition(-1, +2);
-					yPos = boundaryCheckY(yPos);
-					spanElements[i].style.top = yPos + "px";
-				}
-			}
-			return 0;
-		}*/
+    		checkTouchingElements()
+		}
 
 		function boundaryCheckY(yPos) {
 			if (yPos > battlegroundHeight) {
@@ -245,17 +233,6 @@ function chaseElements(attacker, targeted) {
 				parentDiv.appendChild(span);
   			}
 		}
-
-
-
-
-
-
-
-
-
-
-
 		
 		function areElementsTouching(elem1, elem2) {
 	    	const rect1 = elem1.getBoundingClientRect();
@@ -311,6 +288,31 @@ function chaseElements(attacker, targeted) {
 		            }
 		        }
 		    }
+
+		    checkWinner();
+		}
+
+		function checkWinner() {
+			if (document.querySelectorAll('.scissor').length == fighterCount * 3) {
+				if (!hasEnded) {
+					alert("Scissors win!");
+					hasEnded = true;
+				}
+			}
+
+			if (document.querySelectorAll('.rock').length == fighterCount * 3) {
+				if (!hasEnded) {
+					alert("Rock win!");
+					hasEnded = true;
+				}
+			}
+
+			if (document.querySelectorAll('.paper').length == fighterCount * 3) {
+				if (!hasEnded) {
+					alert("Paper win!");
+					hasEnded = true;
+				}
+			}
 		}
 		
 	</script>
