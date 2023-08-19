@@ -80,7 +80,7 @@
 		const battlegroundWidth = battleground.offsetWidth - 22;
 		const battlegroundHeight = battleground.offsetHeight - 22;
 
-		const fighterCount = 20;
+		const fighterCount = 40;
 
 		hasEnded = false;
 
@@ -95,7 +95,7 @@
 				} else {
 					clearInterval(moveElements);
 				}
-			}, 60);
+			}, 80);
 		}
 
 		function calculateDistance(elem1, elem2) {
@@ -128,17 +128,21 @@
         		});
         
         		if (nearestTarget) {
-            		const chaserX = chaser.offsetLeft + getRandomPosition(-1, +2);
-            		const chaserY = chaser.offsetTop + getRandomPosition(-1, +2);
+            		const chaserX = chaser.offsetLeft
+            		const chaserY = chaser.offsetTop
             		const targetX = nearestTarget.offsetLeft;
             		const targetY = nearestTarget.offsetTop;
+            		speed = 1;
+            		if (chasers.length <= 30) {
+            			speed = 3;
+            		}
             
             		if (chaserX !== targetX) {
-        				chaser.style.left = chaserX + (chaserX < targetX ? 1 : -1) + 'px';
+        				chaser.style.left = chaserX + (chaserX < targetX ? speed : -speed) + getRandomPosition(-1, +2) + 'px';
             		}
             
             		if (chaserY !== targetY) {
-                		chaser.style.top = chaserY + (chaserY < targetY ? 1 : -1) + 'px';
+                		chaser.style.top = chaserY + (chaserY < targetY ? speed : -speed) + getRandomPosition(-1, +2) + 'px';
             		}
         		}
     		});
@@ -233,6 +237,33 @@
 				parentDiv.appendChild(span);
   			}
 		}
+
+		function moveElementsApart(element1, element2) {
+    const distance = 3; // Adjust this value based on how much you want the elements to move apart
+    const rect1 = element1.getBoundingClientRect();
+    const rect2 = element2.getBoundingClientRect();
+    
+    const overlapX = Math.max(0, Math.min(rect1.right, rect2.right) - Math.max(rect1.left, rect2.left));
+    const overlapY = Math.max(0, Math.min(rect1.bottom, rect2.bottom) - Math.max(rect1.top, rect2.top));
+    
+    if (overlapX > 0 && overlapY > 0) {
+        if (rect1.left < rect2.left) {
+            element1.style.left = `${parseInt(element1.style.left) - distance}px`;
+            element2.style.left = `${parseInt(element2.style.left) + distance}px`;
+        } else {
+            element1.style.left = `${parseInt(element1.style.left) + distance}px`;
+            element2.style.left = `${parseInt(element2.style.left) - distance}px`;
+        }
+        
+        if (rect1.top < rect2.top) {
+            element1.style.top = `${parseInt(element1.style.top) - distance}px`;
+            element2.style.top = `${parseInt(element2.style.top) + distance}px`;
+        } else {
+            element1.style.top = `${parseInt(element1.style.top) + distance}px`;
+            element2.style.top = `${parseInt(element2.style.top) - distance}px`;
+        }
+    }
+}
 		
 		function areElementsTouching(elem1, elem2) {
 	    	const rect1 = elem1.getBoundingClientRect();
@@ -241,8 +272,8 @@
 	    	const leftDistance = Math.abs(rect1.left - rect2.left);
 	    	const topDistance = Math.abs(rect1.top - rect2.top);
 	    
-		    const horizontalTouch = leftDistance < 20; // Width of the elements
-		    const verticalTouch = topDistance < 20; // Height of the elements
+		    const horizontalTouch = leftDistance < 15; // Width of the elements
+		    const verticalTouch = topDistance < 15; // Height of the elements
 		    
 		    return horizontalTouch && verticalTouch;
 		}
@@ -254,6 +285,8 @@
 		        for (let j = i + 1; j < spanElements.length; j++) {
 		            if (areElementsTouching(spanElements[i], spanElements[j])) {
 		                //console.log("Elements are touching:", spanElements[i], spanElements[j]);
+
+		            	moveElementsApart(spanElements[i], spanElements[j]);
 
 		                if (spanElements[i].classList.contains("scissor") && spanElements[j].classList.contains("paper")) {
 		                	spanElements[j].className = "scissor";
