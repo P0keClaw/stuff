@@ -63,7 +63,7 @@
 				font-family:segoe ui emoji;
 				font-size:"3.5em";
 				margin: 50px auto;
-				width: 900px;
+				width: 500px;
 				height: 500px;
 				border: 1px solid #000;
 			}
@@ -83,26 +83,25 @@
 
 	<script type="text/javascript">
 		const battleground = document.getElementById('battleground');
-		const battlegroundWidth = battleground.offsetWidth - 22;
-		const battlegroundHeight = battleground.offsetHeight - 22;
+const battlegroundWidth = battleground.offsetWidth - 22;
+const battlegroundHeight = battleground.offsetHeight - 22;
+const fighterCount = 30;
+let hasEnded = false;
 
-		const fighterCount = 40;
+window.onload = function () {
+    createSpanElements();
+    animationLoop(); // Start the animation loop
+};
 
-		hasEnded = false;
+function animationLoop() {
+    if (!hasEnded) {
+        chaseElements(".scissor", ".paper", ".rock");
+        chaseElements(".paper", ".rock", ".scissor");
+        chaseElements(".rock", ".scissor", ".paper");
 
-		window.onload = function() {
-			createSpanElements();
-
-			var moveElements = setInterval(function() {
-				if (!hasEnded) {
-					chaseElements(".scissor", ".paper");
-					chaseElements(".paper", ".rock");
-					chaseElements(".rock", ".scissor");
-				} else {
-					clearInterval(moveElements);
-				}
-			}, 80);
-		}
+        requestAnimationFrame(animationLoop); // Schedule the next animation frame
+    }
+}
 
 		function calculateDistance(elem1, elem2) {
     		const x1 = elem1.offsetLeft + elem1.offsetWidth / 2;
@@ -117,41 +116,68 @@
 		}
 
 
-		function chaseElements(attacker, targeted) {
+		function chaseElements(attacker, targeted, fleeingFrom) {
     		const chasers = document.querySelectorAll(attacker);
 			const targets = document.querySelectorAll(targeted);
+			const fleeFrom = document.querySelectorAll(fleeingFrom);
 
     		chasers.forEach(chaser => {
         		let nearestTarget = null;
         		let nearestDistance = Infinity;
+        		let fleeMode = false;
+
+        		// Check if the chaser should flee from any elements
+        fleeFrom.forEach(fleeElement => {
+            const fleeDistance = calculateDistance(chaser, fleeElement);
+            if (fleeDistance < 25) {
+                nearestDistance = fleeDistance;
+                fleeMode = true;
+                nearestTarget = fleeElement;
+            }
+        });
+
+        if (!fleeMode) {
+            targets.forEach(target => {
+                const distance = calculateDistance(chaser, target);
+                if (distance < nearestDistance) {
+                    nearestDistance = distance;
+                    nearestTarget = target;
+                }
+            });
+        }
         
-        		targets.forEach(target => {
-            		const distance = calculateDistance(chaser, target);
-            		if (distance < nearestDistance) {
-                		nearestDistance = distance;
-                		nearestTarget = target;
-            		}
-        		});
-        
-        		if (nearestTarget) {
-            		const chaserX = chaser.offsetLeft
-            		const chaserY = chaser.offsetTop
-            		const targetX = nearestTarget.offsetLeft;
-            		const targetY = nearestTarget.offsetTop;
-            		speed = 1;
-            		if (chasers.length <= (fighterCount/3)/1.2) {
-            			speed = 5;
-            		}
+        if (nearestTarget) {
+            const chaserX = chaser.offsetLeft;
+            const chaserY = chaser.offsetTop;
+            const targetX = nearestTarget.offsetLeft;
+            const targetY = nearestTarget.offsetTop;
+            let speed = 1;
             
-            		if (chaserX !== targetX) {
-        				chaser.style.left = chaserX + (chaserX < targetX ? speed : -speed) + getRandomPosition(-1, +2) + 'px';
-            		}
-            
-            		if (chaserY !== targetY) {
-                		chaser.style.top = chaserY + (chaserY < targetY ? speed : -speed) + getRandomPosition(-1, +2) + 'px';
-            		}
-        		}
-    		});
+            if (chasers.length <= (fighterCount / 3) / 1.2) {
+                speed = 5;
+            }
+
+            if (fleeMode) {
+                // Calculate direction to flee from the nearest target
+                const fleeDirectionX = chaserX < targetX ? -1 : 1;
+                const fleeDirectionY = chaserY < targetY ? -1 : 1;
+                
+
+                // Update chaser's position to flee from the nearest target
+                chaser.style.left = boundaryCheckX(chaserX + fleeDirectionX * speed) + 'px';
+                chaser.style.top = boundaryCheckY(chaserY + fleeDirectionY * speed) + 'px';
+            } else {
+
+                // Chasing behavior as before
+                if (chaserX !== targetX) {
+                    chaser.style.left = boundaryCheckX(chaserX + (chaserX < targetX ? speed : -speed) + getRandomPosition(-1, +2)) + 'px';
+                }
+                if (chaserY !== targetY) {
+                    chaser.style.top = boundaryCheckY(chaserY + (chaserY < targetY ? speed : -speed) + getRandomPosition(-1, +2)) + 'px';
+                }
+            }
+        }
+    });
 
     		checkTouchingElements()
 		}
