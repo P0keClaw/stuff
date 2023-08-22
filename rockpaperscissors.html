@@ -83,25 +83,25 @@
 
 	<script type="text/javascript">
 		const battleground = document.getElementById('battleground');
-const battlegroundWidth = battleground.offsetWidth - 22;
-const battlegroundHeight = battleground.offsetHeight - 22;
-const fighterCount = 30;
-let hasEnded = false;
+		const battlegroundWidth = battleground.offsetWidth - 22;
+		const battlegroundHeight = battleground.offsetHeight - 22;
+		const fighterCount = 30;
+		let hasEnded = false;
 
-window.onload = function () {
-    createSpanElements();
-    animationLoop(); // Start the animation loop
-};
+		window.onload = function () {
+    		createSpanElements();
+    		animationLoop(); // Start the animation loop
+		};
 
-function animationLoop() {
-    if (!hasEnded) {
-        chaseElements(".scissor", ".paper", ".rock");
-        chaseElements(".paper", ".rock", ".scissor");
-        chaseElements(".rock", ".scissor", ".paper");
+		function animationLoop() {
+    		if (!hasEnded) {
+        		chaseElements(".scissor", ".paper", ".rock");
+        		chaseElements(".paper", ".rock", ".scissor");
+        		chaseElements(".rock", ".scissor", ".paper");
 
-        requestAnimationFrame(animationLoop); // Schedule the next animation frame
-    }
-}
+        		requestAnimationFrame(animationLoop); // Schedule the next animation frame
+    		}
+		}
 
 		function calculateDistance(elem1, elem2) {
     		const x1 = elem1.offsetLeft + elem1.offsetWidth / 2;
@@ -127,57 +127,57 @@ function animationLoop() {
         		let fleeMode = false;
 
         		// Check if the chaser should flee from any elements
-        fleeFrom.forEach(fleeElement => {
-            const fleeDistance = calculateDistance(chaser, fleeElement);
-            if (fleeDistance < 25) {
-                nearestDistance = fleeDistance;
-                fleeMode = true;
-                nearestTarget = fleeElement;
-            }
-        });
+        		fleeFrom.forEach(fleeElement => {
+            		const fleeDistance = calculateDistance(chaser, fleeElement);
+            		if (fleeDistance < 25) {
+                		nearestDistance = fleeDistance;
+                		fleeMode = true;
+                		nearestTarget = fleeElement;
+            		}
+        		});
 
-        if (!fleeMode) {
-            targets.forEach(target => {
-                const distance = calculateDistance(chaser, target);
-                if (distance < nearestDistance) {
-                    nearestDistance = distance;
-                    nearestTarget = target;
-                }
-            });
-        }
+        		if (!fleeMode) {
+            		targets.forEach(target => {
+                		const distance = calculateDistance(chaser, target);
+                		if (distance < nearestDistance) {
+                    		nearestDistance = distance;
+                    		nearestTarget = target;
+                		}
+            		});
+        		}
         
-        if (nearestTarget) {
-            const chaserX = chaser.offsetLeft;
-            const chaserY = chaser.offsetTop;
-            const targetX = nearestTarget.offsetLeft;
-            const targetY = nearestTarget.offsetTop;
-            let speed = 1;
+        		if (nearestTarget) {
+            		const chaserX = chaser.offsetLeft;
+		            const chaserY = chaser.offsetTop;
+		            const targetX = nearestTarget.offsetLeft;
+		            const targetY = nearestTarget.offsetTop;
+            		let speed = 1;
             
-            if (chasers.length <= (fighterCount / 3) / 1.2) {
-                speed = 5;
-            }
+		            if (chasers.length <= (fighterCount / 3) / 1.2) {
+		                speed = 5;
+		            }
 
-            if (fleeMode) {
-                // Calculate direction to flee from the nearest target
-                const fleeDirectionX = chaserX < targetX ? -1 : 1;
-                const fleeDirectionY = chaserY < targetY ? -1 : 1;
+		            if (fleeMode) {
+		                // Calculate direction to flee from the nearest target
+		                const fleeDirectionX = chaserX < targetX ? -1 : 1;
+		                const fleeDirectionY = chaserY < targetY ? -1 : 1;
                 
 
-                // Update chaser's position to flee from the nearest target
-                chaser.style.left = boundaryCheckX(chaserX + fleeDirectionX * speed) + 'px';
-                chaser.style.top = boundaryCheckY(chaserY + fleeDirectionY * speed) + 'px';
-            } else {
+		                // Update chaser's position to flee from the nearest target
+		                chaser.style.left = boundaryCheckX(chaserX + fleeDirectionX * speed) + 'px';
+		                chaser.style.top = boundaryCheckY(chaserY + fleeDirectionY * speed) + 'px';
+		            } else {
 
-                // Chasing behavior as before
-                if (chaserX !== targetX) {
-                    chaser.style.left = boundaryCheckX(chaserX + (chaserX < targetX ? speed : -speed) + getRandomPosition(-1, +2)) + 'px';
-                }
-                if (chaserY !== targetY) {
-                    chaser.style.top = boundaryCheckY(chaserY + (chaserY < targetY ? speed : -speed) + getRandomPosition(-1, +2)) + 'px';
-                }
-            }
-        }
-    });
+		                // Chasing behavior as before
+		                if (chaserX !== targetX) {
+		                    chaser.style.left = boundaryCheckX(chaserX + (chaserX < targetX ? speed : -speed) + getRandomPosition(-1, +2)) + 'px';
+		                }
+		                if (chaserY !== targetY) {
+		                    chaser.style.top = boundaryCheckY(chaserY + (chaserY < targetY ? speed : -speed) + getRandomPosition(-1, +2)) + 'px';
+		                }
+            		}
+        		}
+    		});
 
     		checkTouchingElements()
 		}
@@ -268,31 +268,31 @@ function animationLoop() {
 		}
 
 		function moveElementsApart(element1, element2) {
-    const distance = 2; // Adjust this value based on how much you want the elements to move apart
-    const rect1 = element1.getBoundingClientRect();
-    const rect2 = element2.getBoundingClientRect();
+		    const distance = 2; // Adjust this value based on how much you want the elements to move apart
+		    const rect1 = element1.getBoundingClientRect();
+		    const rect2 = element2.getBoundingClientRect();
+		    
+		    const overlapX = Math.max(0, Math.min(rect1.right, rect2.right) - Math.max(rect1.left, rect2.left));
+		    const overlapY = Math.max(0, Math.min(rect1.bottom, rect2.bottom) - Math.max(rect1.top, rect2.top));
     
-    const overlapX = Math.max(0, Math.min(rect1.right, rect2.right) - Math.max(rect1.left, rect2.left));
-    const overlapY = Math.max(0, Math.min(rect1.bottom, rect2.bottom) - Math.max(rect1.top, rect2.top));
-    
-    if (overlapX > 0 && overlapY > 0) {
-        if (rect1.left < rect2.left) {
-            element1.style.left = `${parseInt(element1.style.left) - distance}px`;
-            element2.style.left = `${parseInt(element2.style.left) + distance}px`;
-        } else {
-            element1.style.left = `${parseInt(element1.style.left) + distance}px`;
-            element2.style.left = `${parseInt(element2.style.left) - distance}px`;
-        }
-        
-        if (rect1.top < rect2.top) {
-            element1.style.top = `${parseInt(element1.style.top) - distance}px`;
-            element2.style.top = `${parseInt(element2.style.top) + distance}px`;
-        } else {
-            element1.style.top = `${parseInt(element1.style.top) + distance}px`;
-            element2.style.top = `${parseInt(element2.style.top) - distance}px`;
-        }
-    }
-}
+		    if (overlapX > 0 && overlapY > 0) {
+		        if (rect1.left < rect2.left) {
+		            element1.style.left = `${parseInt(element1.style.left) - distance}px`;
+		            element2.style.left = `${parseInt(element2.style.left) + distance}px`;
+		        } else {
+		            element1.style.left = `${parseInt(element1.style.left) + distance}px`;
+		            element2.style.left = `${parseInt(element2.style.left) - distance}px`;
+		        }
+		        
+		        if (rect1.top < rect2.top) {
+		            element1.style.top = `${parseInt(element1.style.top) - distance}px`;
+		            element2.style.top = `${parseInt(element2.style.top) + distance}px`;
+		        } else {
+		            element1.style.top = `${parseInt(element1.style.top) + distance}px`;
+		            element2.style.top = `${parseInt(element2.style.top) - distance}px`;
+		        }
+		    }
+		}
 		
 		function areElementsTouching(elem1, elem2) {
 	    	const rect1 = elem1.getBoundingClientRect();
@@ -313,7 +313,6 @@ function animationLoop() {
 		    for (let i = 0; i < spanElements.length; i++) {
 		        for (let j = i + 1; j < spanElements.length; j++) {
 		            if (areElementsTouching(spanElements[i], spanElements[j])) {
-		                //console.log("Elements are touching:", spanElements[i], spanElements[j]);
 
 		            	moveElementsApart(spanElements[i], spanElements[j]);
 
