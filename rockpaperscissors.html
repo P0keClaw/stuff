@@ -85,8 +85,11 @@
 		const battleground = document.getElementById('battleground');
 		const battlegroundWidth = battleground.offsetWidth - 22;
 		const battlegroundHeight = battleground.offsetHeight - 22;
-		const fighterCount = 30;
+		const fighterCount = 20;
 		let hasEnded = false;
+
+		// Create a virtual representation of elements
+		const spanElements = [];
 
 		window.onload = function () {
     		createSpanElements();
@@ -114,7 +117,6 @@
     
     		return Math.sqrt(dx * dx + dy * dy);
 		}
-
 
 		function chaseElements(attacker, targeted, fleeingFrom) {
     		const chasers = document.querySelectorAll(attacker);
@@ -154,7 +156,7 @@
             		let speed = 1;
             
 		            if (chasers.length <= (fighterCount / 3) / 1.2) {
-		                speed = 5;
+		                speed = 3;
 		            }
 
 		            if (fleeMode) {
@@ -164,16 +166,16 @@
                 
 
 		                // Update chaser's position to flee from the nearest target
-		                chaser.style.left = boundaryCheckX(chaserX + fleeDirectionX * speed) + 'px';
-		                chaser.style.top = boundaryCheckY(chaserY + fleeDirectionY * speed) + 'px';
+		                chaser.style.left = boundaryCheck(chaserX + fleeDirectionX * speed) + 'px';
+		                chaser.style.top = boundaryCheck(chaserY + fleeDirectionY * speed) + 'px';
 		            } else {
 
 		                // Chasing behavior as before
 		                if (chaserX !== targetX) {
-		                    chaser.style.left = boundaryCheckX(chaserX + (chaserX < targetX ? speed : -speed) + getRandomPosition(-1, +2)) + 'px';
+		                    chaser.style.left = boundaryCheck(chaserX + (chaserX < targetX ? speed : -speed) + getRandomPosition(-1, +2)) + 'px';
 		                }
 		                if (chaserY !== targetY) {
-		                    chaser.style.top = boundaryCheckY(chaserY + (chaserY < targetY ? speed : -speed) + getRandomPosition(-1, +2)) + 'px';
+		                    chaser.style.top = boundaryCheck(chaserY + (chaserY < targetY ? speed : -speed) + getRandomPosition(-1, +2)) + 'px';
 		                }
             		}
         		}
@@ -182,84 +184,64 @@
     		checkTouchingElements()
 		}
 
-		function boundaryCheckY(yPos) {
-			if (yPos > battlegroundHeight) {
-					yPos = battlegroundHeight;
-				}
-
-			if (yPos < 0) {
-				yPos = 0;
+		function boundaryCheck(pos) {
+			if (pos > battlegroundHeight) {
+				pos = battlegroundHeight;
+			} else if (pos > battlegroundWidth) {
+				pos = battlegroundWidth;
+			} else if (pos < 0) {
+				pos = 0;
 			}
 
-			return yPos;
-		}
-
-		function boundaryCheckX(xPos) {
-			if (xPos > battlegroundWidth) {
-				xPos = battlegroundWidth;
-			}
-
-			if (xPos < 0) {
-				xPos = 0;
-			}
-
-			return xPos;
+			return pos;
 		}
 
 		function getRandomPosition(min, max) {
   			return Math.floor(Math.random() * (max - min) + min);
 		}
 
-
 		function checkCollision(x, y, elements) {
-  			const rect1 = { left: x, right: x + 20, top: y, bottom: y + 20 };
+  			const rect1 = { left: x, right: x + 50, top: y, bottom: y + 50 };
   			for (const el of elements) {
     			const rect2 = el.getBoundingClientRect();
-    			if (
-				rect1.left < rect2.right &&
-				rect1.right > rect2.left &&
-				rect1.top < rect2.bottom &&
-				rect1.bottom > rect2.top
-    			) {
+    			if (rect1.left < rect2.right && rect1.right > rect2.left && rect1.top < rect2.bottom && rect1.bottom > rect2.top) {
       				return true;
     			}
   			}
   			return false;
 		}
 
-		function createSpanElements(fighterType) {
+		function createSpanElements() {
   			const parentDiv = battleground;
   			const numElements = fighterCount * 3;
   			const maxAttempts = 100;
   			const spanElements = [];
 
 			for (let i = 0; i < numElements; i++) {
-				let xPos, yPos, attempts = 0;
+				let xPos, yPos = 0;
 
-				do {
-					xPos = getRandomPosition(0, battlegroundWidth);
-					yPos = getRandomPosition(0, battlegroundHeight);
-					attempts++;
-
-					if (attempts >= maxAttempts) {
-						console.log("Could not find a suitable position for element", i);
-						break;
-					}
-				} while (checkCollision(xPos, yPos, spanElements));
+				xPos = getRandomPosition(0, battlegroundWidth);
+				yPos = getRandomPosition(0, battlegroundHeight);
 
 				const span = document.createElement("span");
 				span.style.left = xPos + "px";
 				span.style.top = yPos + "px";
 
-				if (i % 3 === 0) {
-					span.innerHTML = "✂";
-					span.className = "scissor";
-				} else if (i % 3 === 1) {
-					span.innerHTML = "🌑";
-					span.className = "rock";
-				} else {
-					span.innerHTML = "📜";
-					span.className = "paper";
+				switch (i % 3) {
+					case 0:
+						span.innerHTML = "✂";
+						span.className = "scissor";
+						break;
+
+					case 1:
+						span.innerHTML = "🌑";
+						span.className = "rock";
+						break;
+
+					default:
+						span.innerHTML = "📜";
+						span.className = "paper";
+						break;
 				}
 
 				spanElements.push(span);
@@ -295,16 +277,13 @@
 		}
 		
 		function areElementsTouching(elem1, elem2) {
-	    	const rect1 = elem1.getBoundingClientRect();
-	    	const rect2 = elem2.getBoundingClientRect();
-	    
-	    	const leftDistance = Math.abs(rect1.left - rect2.left);
-	    	const topDistance = Math.abs(rect1.top - rect2.top);
-	    
-		    const horizontalTouch = leftDistance < 15; // Width of the elements
-		    const verticalTouch = topDistance < 15; // Height of the elements
-		    
-		    return horizontalTouch && verticalTouch;
+    		const rect1 = elem1.getBoundingClientRect();
+    		const rect2 = elem2.getBoundingClientRect();
+
+    		return (
+        		Math.abs(rect1.left - rect2.left) < 15 &&
+        		Math.abs(rect1.top - rect2.top) < 15
+    		);
 		}
 
 		function checkTouchingElements() {
@@ -353,28 +332,32 @@
 		    checkWinner();
 		}
 
+		let winnerCheckCounter = 0;
+		const winnerCheckFrequency = 60; // Check winners every 60 frames
+
 		function checkWinner() {
-			if (document.querySelectorAll('.scissor').length == fighterCount * 3) {
-				if (!hasEnded) {
-					alert("Scissors win!");
-					hasEnded = true;
-				}
-			}
+		    winnerCheckCounter++;
+		    if (winnerCheckCounter >= winnerCheckFrequency) {
+		        winnerCheckCounter = 0;
+		        if (!hasEnded) {
+		            const scissorCount = document.querySelectorAll('.scissor').length;
+		            const rockCount = document.querySelectorAll('.rock').length;
+		            const paperCount = document.querySelectorAll('.paper').length;
 
-			if (document.querySelectorAll('.rock').length == fighterCount * 3) {
-				if (!hasEnded) {
-					alert("Rock win!");
-					hasEnded = true;
-				}
-			}
-
-			if (document.querySelectorAll('.paper').length == fighterCount * 3) {
-				if (!hasEnded) {
-					alert("Paper win!");
-					hasEnded = true;
-				}
-			}
+		            if (scissorCount === fighterCount * 3) {
+		                alert("Scissors win!");
+		                hasEnded = true;
+		            } else if (rockCount === fighterCount * 3) {
+		                alert("Rock wins!");
+		                hasEnded = true;
+		            } else if (paperCount === fighterCount * 3) {
+		                alert("Paper wins!");
+		                hasEnded = true;
+		            }
+		        }
+		    }
 		}
+
 		
 	</script>
 </html>
