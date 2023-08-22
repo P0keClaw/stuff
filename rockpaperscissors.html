@@ -37,6 +37,7 @@
 
 			body {
 				line-height: 1;
+				transition: background-color .2s linear;
 			}
 
 			ol, ul {
@@ -58,14 +59,44 @@
 				border-spacing: 0;
 			}
 
+			h1 {
+				text-align: center;
+				font-family: "Arial";
+				font-weight: bold;
+				font-size: 24px;
+				margin: 10px;
+			}
+
+			.winnerScreen {
+				position: fixed;
+				font-family:segoe ui emoji;
+				top: 50px;
+				left: 50px;
+				font-size: 36px;
+				padding: 20px;
+				background-color: #fff;
+				z-index: 100;
+			}
+
+			#logs {
+				position: absolute;
+				padding: 20px;
+				font-size: 18px;
+				font-family:segoe ui emoji;
+				top: 50px;
+				left: 50px;
+				color: #000;
+				max-height: 500px;
+				overflow-y: hidden;
+			}
+
 			#battleground {
 				position: relative;
 				font-family:segoe ui emoji;
 				font-size:"3.5em";
 				margin: 50px auto;
-				width: 500px;
-				height: 500px;
-				border: 1px solid #000;
+				border: 3px solid #000;
+				background-color: #fff;
 			}
 
 			#battleground span {
@@ -77,15 +108,23 @@
 	</head>
 
 	<body>
+		<h1 id="logs"></h1>
 		<h1>Rock, Paper, Scissors Simulator</h1>
 		<div id="battleground"></div>
 	</body>
 
 	<script type="text/javascript">
+		/////// CONFIG ////////
+		const symbols = ["✂", "🌑", "📜"];
+		const battlegroundSize = 500;
+		const fighterCount = 30;
+
+		const log = document.getElementById('logs');
 		const battleground = document.getElementById('battleground');
-		const battlegroundWidth = battleground.offsetWidth - 22;
-		const battlegroundHeight = battleground.offsetHeight - 22;
-		const fighterCount = 20;
+		battleground.style.width = battlegroundSize + "px";
+		battleground.style.height = battlegroundSize + "px";
+		const battlegroundWidth = battleground.style.width.slice(0, -2) - 22;
+		const battlegroundHeight = battleground.style.height.slice(0, -2) - 22;
 		let hasEnded = false;
 
 		// Create a virtual representation of elements
@@ -214,7 +253,6 @@
 		function createSpanElements() {
   			const parentDiv = battleground;
   			const numElements = fighterCount * 3;
-  			const maxAttempts = 100;
   			const spanElements = [];
 
 			for (let i = 0; i < numElements; i++) {
@@ -229,17 +267,17 @@
 
 				switch (i % 3) {
 					case 0:
-						span.innerHTML = "✂";
+						span.innerHTML = symbols[0];
 						span.className = "scissor";
 						break;
 
 					case 1:
-						span.innerHTML = "🌑";
+						span.innerHTML = symbols[1];
 						span.className = "rock";
 						break;
 
 					default:
-						span.innerHTML = "📜";
+						span.innerHTML = symbols[2];
 						span.className = "paper";
 						break;
 				}
@@ -297,32 +335,38 @@
 
 		                if (spanElements[i].classList.contains("scissor") && spanElements[j].classList.contains("paper")) {
 		                	spanElements[j].className = "scissor";
-		                	spanElements[j].innerHTML = "✂"
+		                	spanElements[j].innerHTML = symbols[0];
+		                	//battleLog(symbols[0] + " slices " + symbols[2] + "!<br />");
 		                }
 
 		                if (spanElements[i].classList.contains("rock") && spanElements[j].classList.contains("scissor")) {
 		                	spanElements[j].className = "rock";
-		                	spanElements[j].innerHTML = "🌑"
+		                	spanElements[j].innerHTML = symbols[1];
+		                	//battleLog(symbols[1] + " crushes " + symbols[0] + "!<br />");
 		                }
 
 		                if (spanElements[i].classList.contains("paper") && spanElements[j].classList.contains("rock")) {
 		                	spanElements[j].className = "paper";
-		                	spanElements[j].innerHTML = "📜"
+		                	spanElements[j].innerHTML = symbols[2];
+		                	//battleLog(symbols[2] + " defeats " + symbols[1] + "!<br />");
 		                }
 
 		                if (spanElements[j].classList.contains("scissor") && spanElements[i].classList.contains("paper")) {
 		                	spanElements[i].className = "scissor";
-		                	spanElements[i].innerHTML = "✂"
+		                	spanElements[i].innerHTML = symbols[0];
+		                	//battleLog(symbols[0] + " slices " + symbols[2] + "!<br />");
 		                }
 
 		                if (spanElements[j].classList.contains("rock") && spanElements[i].classList.contains("scissor")) {
 		                	spanElements[i].className = "rock";
-		                	spanElements[i].innerHTML = "🌑"
+		                	spanElements[i].innerHTML = symbols[1];
+		                	//battleLog(symbols[1] + " crushes " + symbols[0] + "!<br />");
 		                }
 
 		                if (spanElements[j].classList.contains("paper") && spanElements[i].classList.contains("rock")) {
 		                	spanElements[i].className = "paper";
-		                	spanElements[i].innerHTML = "📜"
+		                	spanElements[i].innerHTML = symbols[2];
+		                	//battleLog(symbols[2] + " defeats " + symbols[1] + "!<br />");
 		                }
 										
 		            }
@@ -345,19 +389,37 @@
 		            const paperCount = document.querySelectorAll('.paper').length;
 
 		            if (scissorCount === fighterCount * 3) {
-		                alert("Scissors win!");
+		                document.body.style = "background-color: #dd2e44";
+		                createWinnerScreen(symbols[0]);
 		                hasEnded = true;
 		            } else if (rockCount === fighterCount * 3) {
-		                alert("Rock wins!");
+		                document.body.style = "background-color: #808080";
+		                createWinnerScreen(symbols[1]);
 		                hasEnded = true;
 		            } else if (paperCount === fighterCount * 3) {
-		                alert("Paper wins!");
+		                document.body.style = "background-color: #ffd983";
+		                createWinnerScreen(symbols[2]);
 		                hasEnded = true;
 		            }
 		        }
 		    }
 		}
 
+		function createWinnerScreen(winner) {
+			const winnerScreen = document.createElement("h1");
+			winnerScreen.className = "winnerScreen";
+			winnerScreen.innerHTML = winner + " wins!";
+			document.body.appendChild(winnerScreen);
+		}
 		
+		/*
+		function battleLog(text) {
+			existingText = log.innerHTML;
+
+			modify = text + existingText;
+
+			log.innerHTML = modify
+		}
+		*/
 	</script>
 </html>
